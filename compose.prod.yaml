@@ -1,0 +1,34 @@
+# Production overrides — only what differs from compose.yaml on the VPS.
+#
+#   docker compose -f compose.yaml -f compose.prod.yaml <command>
+#   ./scripts/compose-prod.sh <command>          (the same, from anywhere)
+#
+# Never run the VPS with compose.yaml alone: it publishes core and web on the
+# host's loopback, for local use.
+#
+# Needs Docker Compose >= 2.24 for `!reset` (a plain `ports: []` is merged
+# with, not substituted for, the base list).
+#
+#   Caddy (another stack) ── proxy ──▶ web (as manager-web:80)
+#                                        │ backend
+#                                        ▼
+#                                      core:8787 ◀── backend ── telegram
+#
+# `proxy` is created once, outside this project (`docker network create
+# proxy`, unless the Caddy stack already manages it), and shared with Caddy.
+# Only `web` joins it. core and telegram stay on the private `backend`
+# network, where they keep outbound Internet access.
+services:
+  web:
+    # No host port: Caddy reaches it over `proxy`.
+    ports: !reset []
+    networks:
+      backend:
+      proxy:
+        aliases:
+          - manager-web
+
+networks:
+  proxy:
+    external: true
+    name: proxy

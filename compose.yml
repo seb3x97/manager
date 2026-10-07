@@ -1,0 +1,10 @@
+name: manager
+
+services:
+  # The Control Center: the production web build served by Nginx, with /api/*
+  # proxied to core:8787 and the bearer token added there. Caddy on the host
+  # terminates HTTPS and is the access boundary, in front of this port.
+  web:
+    build:
+      context: .
+
