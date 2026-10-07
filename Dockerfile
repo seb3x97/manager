@@ -9,7 +9,7 @@ RUN npm install -g serve
 COPY . .
 
 # Exposer le port
-EXPOSE 4100
+EXPOSE 80
 
 # Lancer le serveur
-CMD ["serve", ".", "-l", "4100"]
+CMD ["serve", ".", "-l", "80"]
